@@ -21,20 +21,21 @@ Name: "french"; MessagesFile: "compiler:Languages\French.isl"
 
 [Files]
 ; IMPORTANT: Placez ce script à côté du dossier 'dist' créé par PyInstaller.
-Source: "dist\SyncMarkDaemon.exe"; DestDir: "{app}"; Flags: ignoreversion
+; Nous utilisons maintenant un seul exécutable pour le service d'arrière-plan.
+Source: "dist\SyncMarkHost.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "dist\SyncMarkSettings.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\SyncMark Settings"; Filename: "{app}\SyncMarkSettings.exe"
-Name: "{commondesktop}\SyncMark Settings"; Filename: "{app}\SyncMarkSettings.exe"; Tasks: desktopicon
+Name: "{group}\Paramètres SyncMark"; Filename: "{app}\SyncMarkSettings.exe"
+Name: "{commondesktop}\Paramètres SyncMark"; Filename: "{app}\SyncMarkSettings.exe"; Tasks: desktopicon
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}";
 
 [Registry]
-; Lance SyncMarkDaemon.exe au démarrage de Windows pour l'utilisateur actuel
+; Lance SyncMarkHost.exe au démarrage de Windows pour l'utilisateur actuel
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
-    ValueType: string; ValueName: "SyncMark"; ValueData: """{app}\SyncMarkDaemon.exe"""; \
+    ValueType: string; ValueName: "SyncMark"; ValueData: """{app}\SyncMarkHost.exe"""; \
     Flags: uninsdeletevalue
 
 ; --- Enregistrement de l'hôte de messagerie natif ---
@@ -62,14 +63,15 @@ begin
     // Définit le chemin complet du fichier manifeste
     ManifestPath := ExpandConstant('{app}\com.syncmark.host.json');
     
-    // Contenu du fichier JSON
-    SetArrayLength(ManifestLines, 6);
+    // CORRECTION: La taille du tableau doit être 7 pour avoir des indices de 0 à 6.
+    SetArrayLength(ManifestLines, 7);
     ManifestLines[0] := '{';
     ManifestLines[1] := '  "name": "com.syncmark.host",';
     ManifestLines[2] := '  "description": "Programme compagnon pour SyncMark",';
     // Utilise une fonction pour échapper les backslashes dans le chemin
-    ManifestLines[3] := '  "path": "' + StringChange(ExpandConstant('{app}\SyncMarkDaemon.exe'), '\', '\\') + '",';
+    ManifestLines[3] := '  "path": "' + StringChange(ExpandConstant('{app}\SyncMarkHost.exe'), '\', '\\') + '",';
     ManifestLines[4] := '  "type": "stdio",';
+    // IMPORTANT: N'oubliez pas de remplacer l'ID ci-dessous !
     ManifestLines[5] := '  "allowed_origins": ["chrome-extension://ID_DE_VOTRE_EXTENSION/"]';
     ManifestLines[6] := '}';
     
